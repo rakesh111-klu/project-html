@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipe Haven</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #fffaf5;
+            color: #333;
+        }
+
+        #loginPage {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f4eee8;
+        }
+
+        .login-box {
+            width: 350px;
+            background: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px #bbb;
+        }
+
+        .login-box h1,
+        .hero h1,
+        h2,
+        .card h3 {
+            font-family: Georgia;
+        }
+
+        .login-box h1,
+        .category {
+            color: #9b5c38;
+        }
+
+        input {
+            padding: 12px;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        button {
+            background: #9b5c38;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            cursor: pointer;
+        }
+
+        .login-box button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .switch span {
+            color: #9b5c38;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #error,
+        #signupError {
+            color: red;
+        }
+
+        #signupPage,
+        #recipePage {
+            display: none;
+        }
+
+        header {
+            background: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #9b5c38;
+        }
+
+        .layout {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 230px;
+            min-height: calc(100vh - 70px);
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: white;
+            color: #182c3d;
+            margin: 3px 0;
+        }
+
+        .sidebar button:hover {
+            background: #f4eee8;
+            color: #9b5c38;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 45px;
+            background: #f4eee8;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin: 10px;
+        }
+
+        .search {
+            text-align: center;
+            padding: 25px;
+            background: white;
+        }
+
+        .search input {
+            width: 350px;
+        }
+
+        .recipe-section {
+            width: 90%;
+            margin: auto;
+            padding: 25px 0;
+        }
+
+        .recipe-section h2 {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        #recipes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 15px #ccc;
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 15px;
+        }
+
+        .card h3 {
+            margin: 5px 0;
+        }
+
+        .favorite {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: white;
+            color: red;
+            border-radius: 50%;
+            font-size: 20px;
+            padding: 5px 10px;
+        }
+
+        .remove-favorite {
+            background: #c0392b;
+            color: white;
+            margin-top: 8px;
+            padding: 8px 12px;
+        }
+
+        #details {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .details-box {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .details-box img {
+            width: 70%;
+            height: 350px;
+            object-fit: cover;
+            display: block;
+            margin: 20px auto;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media(max-width: 900px) {
+            #recipes {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            #recipes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="loginPage">
+
+    <div class="login-box" id="loginBox">
+
+        <h1>Recipe Haven</h1>
+        <h2>Login</h2>
+
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+
+        <button onclick="login()">LOGIN</button>
+
+        <p id="error"></p>
+
+        <p class="switch">
+            Don't have an account?
+            <span onclick="showSignup()">Sign Up</span>
+        </p>
+
+    </div>
+
+    <div class="login-box" id="signupPage">
+
+        <h1>Recipe Haven</h1>
+        <h2>Sign Up</h2>
+
+        <input id="newUser" placeholder="Create Username">
+        <input id="newEmail" placeholder="Email">
+        <input id="newPass" type="password" placeholder="Password">
+        <input id="confirmPass" type="password" placeholder="Confirm Password">
+
+        <button onclick="signup()">SIGN UP</button>
+
+        <p id="signupError"></p>
+
+        <p class="switch">
+            Already have an account?
+            <span onclick="showLogin()">Login</span>
+        </p>
+
+    </div>
+
+</div>
+
+<div id="recipePage">
+
+    <header>
+
+        <div class="logo">Recipe Haven</div>
+
+        <button onclick="logout()">Logout</button>
+
+    </header>
+
+    <div class="layout">
+
+        <div class="sidebar">
+
+            <button onclick="showAll()">HOME</button>
+
+            <b>RECIPES</b>
+
+            <button onclick="filterRecipe('Breakfast')">
+                BREAKFAST
+            </button>
+
+            <button onclick="filterRecipe('Lunch')">
+                LUNCH
+            </button>
+
+            <button onclick="filterRecipe('Dinner')">
+                DINNER
+            </button>
+
+            <button onclick="filterRecipe('Dessert')">
+                DESSERT
+            </button>
+
+            <button onclick="filterRecipe('Chicken')">
+                CHICKEN RECIPES
+            </button>
+
+            <button onclick="filterRecipe('Healthy')">
+                HEALTHY RECIPES
+            </button>
+
+            <button onclick="filterRecipe('Main Dish')">
+                MAIN DISH
+            </button>
+
+            <button onclick="filterRecipe('Sides')">
+                SIDES
+            </button>
+
+            <button onclick="showFavorites()">
+                ❤️ FAVORITES
+            </button>
+
+        </div>
+
+        <div class="content">
+
+            <div class="hero">
+
+                <h1 id="pageTitle">
+                    Delicious Recipes
+                </h1>
+
+                <p>
+                    Simple recipes for every occasion
+                </p>
+
+            </div>
+
+            <div class="search">
+
+                <input
+                    id="search"
+                    placeholder="Search recipe by name"
+                    onkeyup="searchRecipe()">
+
+                <button onclick="searchRecipe()">
+                    Search
+                </button>
+
+                <button onclick="showAll()">
+                    Clear
+                </button>
+
+            </div>
+
+            <section class="recipe-section">
+
+                <h2 id="title">
+                    Latest Recipes
+                </h2>
+
+                <div id="recipes"></div>
+
+            </section>
+
+            <footer>
+                © 2026 Recipe Haven
+            </footer>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="details">
+
+    <div class="details-box">
+
+        <button onclick="closeDetails()">
+            ✕ Close
+        </button>
+
+        <img id="detailImage">
+
+        <h1 id="detailName"></h1>
+
+        <p id="detailCategory"></p>
+
+        <h2>Ingredients</h2>
+
+        <p id="detailIngredients"></p>
+
+        <h2>Preparation</h2>
+
+        <p id="detailPreparation"></p>
+
+    </div>
+
+</div>
+
+<script>
+
+let recipes = [
+
+    {
+        name: "Classic Pancakes",
+        category: "Breakfast",
+        image: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Flour, Milk, Eggs, Sugar and Butter.",
+        preparation: "Mix all ingredients. Heat a pan and cook the pancakes on both sides."
+    },
+
+    {
+        name: "Vegetable Sandwich",
+        category: "Lunch",
+        image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Bread, Tomato, Onion, Cucumber and Cheese.",
+        preparation: "Cut the vegetables and place them between bread slices."
+    },
+
+    {
+        name: "Chicken Biryani",
+        category: "Dinner",
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=1000&q=90",
+        ingredients: "Chicken, Basmati Rice, Onion, Tomato, Yogurt and Biryani Spices.",
+        preparation: "Marinate the chicken with spices. Cook the chicken, add basmati rice and cook on low heat until the rice is fluffy and the chicken is tender."
+    },
+
+    {
+        name: "Chicken Curry",
+        category: "Chicken",
+        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Chicken, Onion, Tomato, Ginger and Garlic.",
+        preparation: "Cook onion and spices. Add chicken and cook until tender."
+    },
+
+    {
+        name: "Chocolate Cake",
+        category: "Dessert",
+        image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Flour, Cocoa, Sugar, Eggs, Milk and Butter.",
+        preparation: "Mix the ingredients and bake until the cake is completely cooked."
+    },
+
+    {
+        name: "Fruit Salad",
+        category: "Healthy",
+        image: "https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Apple, Banana, Orange, Grapes and Pomegranate.",
+        preparation: "Cut all fruits into small pieces and mix them together."
+    },
+
+    {
+        name: "Vegetable Pizza",
+        category: "Main Dish",
+        image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Pizza Base, Cheese, Tomato, Onion and Capsicum.",
+        preparation: "Add vegetables and cheese to the pizza base and bake."
+    },
+
+    {
+        name: "Garlic Bread",
+        category: "Sides",
+        image: "https://images.unsplash.com/photo-1573140401552-3fab0b24306f?auto=format&fit=crop&w=800&q=80",
+        ingredients: "Bread, Garlic, Butter and Herbs.",
+        preparation: "Spread garlic butter on bread and bake until crispy."
+    }
+
+];
+
+let favorites =
+    JSON.parse(localStorage.getItem("favorites")) || [];
+
+function showSignup() {
+
+    document.getElementById("loginBox").style.display = "none";
+
+    document.getElementById("signupPage").style.display = "block";
+}
+
+function showLogin() {
+
+    document.getElementById("signupPage").style.display = "none";
+
+    document.getElementById("loginBox").style.display = "block";
+}
+
+function signup() {
+
+    let user =
+        document.getElementById("newUser").value;
+
+    let pass =
+        document.getElementById("newPass").value;
+
+    let confirm =
+        document.getElementById("confirmPass").value;
+
+    if (user == "" || pass == "") {
+
+        document.getElementById("signupError").innerText =
+            "Please fill all fields";
+
+        return;
+    }
+
+    if (pass != confirm) {
+
+        document.getElementById("signupError").innerText =
+            "Passwords do not match";
+
+        return;
+    }
+
+    localStorage.setItem("username", user);
+
+    localStorage.setItem("password", pass);
+
+    alert("Sign Up successful!");
+
+    showLogin();
+}
+
+function login() {
+
+    let user =
+        document.getElementById("username").value;
+
+    let pass =
+        document.getElementById("password").value;
+
+    let savedUser =
+        localStorage.getItem("username");
+
+    let savedPass =
+        localStorage.getItem("password");
+
+    if (user == savedUser && pass == savedPass) {
+
+        document.getElementById("loginPage").style.display =
+            "none";
+
+        document.getElementById("recipePage").style.display =
+            "block";
+
+        showAll();
+
+    } else {
+
+        document.getElementById("error").innerText =
+            "Invalid username or password";
+    }
+}
+
+function logout() {
+
+    document.getElementById("recipePage").style.display =
+        "none";
+
+    document.getElementById("loginPage").style.display =
+        "flex";
+}
+
+function displayRecipes(list, favoritePage = false) {
+
+    let output = "";
+
+    if (list.length == 0) {
+
+        output = "<p>No favorite recipes found.</p>";
+    }
+
+    list.forEach(function(recipe) {
+
+        let index = recipes.indexOf(recipe);
+
+        let heart =
+            favorites.includes(recipe.name)
+            ? "♥"
+            : "♡";
+
+        output += `
+
+            <div class="card"
+                 onclick="viewRecipe(${index})">
+
+                <button class="favorite"
+                        onclick="favorite(event, ${index})">
+
+                    ${heart}
+
+                </button>
+
+                <img
+                    src="${recipe.image}"
+                    alt="${recipe.name}"
+                    onerror="this.style.display='none';">
+
+                <div class="card-content">
+
+                    <div class="category">
+                        ${recipe.category}
+                    </div>
+
+                    <h3>
+                        ${recipe.name}
+                    </h3>
+
+                    <p>
+                        ${recipe.ingredients}
+                    </p>
+
+                    ${
+                        favoritePage
+                        ?
+                        `<button
+                            class="remove-favorite"
+                            onclick="removeFavorite(event, ${index})">
+                            Remove from Favorites
+                         </button>`
+                        :
+                        ""
+                    }
+
+                </div>
+
+            </div>
+
+        `;
+    });
+
+    document.getElementById("recipes").innerHTML =
+        output;
+}
+
+function showAll() {
+
+    document.getElementById("pageTitle").innerText =
+        "Delicious Recipes";
+
+    document.getElementById("title").innerText =
+        "Latest Recipes";
+
+    document.getElementById("search").value = "";
+
+    displayRecipes(recipes);
+}
+
+function filterRecipe(category) {
+
+    let result =
+        recipes.filter(function(recipe) {
+
+            return recipe.category == category;
+
+        });
+
+    document.getElementById("pageTitle").innerText =
+        category + " Recipes";
+
+    document.getElementById("title").innerText =
+        category + " Recipes";
+
+    displayRecipes(result);
+}
+
+function searchRecipe() {
+
+    let text =
+        document.getElementById("search").value.toLowerCase();
+
+    let result =
+        recipes.filter(function(recipe) {
+
+            return recipe.name
+                .toLowerCase()
+                .includes(text);
+
+        });
+
+    document.getElementById("pageTitle").innerText =
+        "Search Results";
+
+    document.getElementById("title").innerText =
+        "Search Results";
+
+    displayRecipes(result);
+}
+
+function favorite(event, index) {
+
+    event.stopPropagation();
+
+    let name =
+        recipes[index].name;
+
+    if (favorites.includes(name)) {
+
+        alert("Recipe is already in Favorites!");
+
+        return;
+    }
+
+    favorites.push(name);
+
+    localStorage.setItem(
+        "favorites",
+        JSON.stringify(favorites)
+    );
+
+    alert(name + " added to Favorites!");
+
+    displayRecipes(recipes);
+}
+
+function showFavorites() {
+
+    document.getElementById("search").value = "";
+
+    let result =
+        recipes.filter(function(recipe) {
+
+            return favorites.includes(recipe.name);
+
+        });
+
+    document.getElementById("pageTitle").innerText =
+        "My Favorites";
+
+    document.getElementById("title").innerText =
+        "Favorite Recipes";
+
+    displayRecipes(result, true);
+}
+
+function removeFavorite(event, index) {
+
+    event.stopPropagation();
+
+    let name =
+        recipes[index].name;
+
+    favorites =
+        favorites.filter(function(item) {
+
+            return item != name;
+
+        });
+
+    localStorage.setItem(
+        "favorites",
+        JSON.stringify(favorites)
+    );
+
+    alert(name + " removed from Favorites!");
+
+    showFavorites();
+}
+
+function viewRecipe(index) {
+
+    let recipe =
+        recipes[index];
+
+    document.getElementById("detailImage").src =
+        recipe.image;
+
+    document.getElementById("detailName").innerText =
+        recipe.name;
+
+    document.getElementById("detailCategory").innerText =
+        "Category: " + recipe.category;
+
+    document.getElementById("detailIngredients").innerText =
+        recipe.ingredients;
+
+    document.getElementById("detailPreparation").innerText =
+        recipe.preparation;
+
+    document.getElementById("details").style.display =
+        "block";
+}
+
+function closeDetails() {
+
+    document.getElementById("details").style.display =
+        "none";
+}
+
+displayRecipes(recipes);
+
+</script>
+
+</body>
+</html>
